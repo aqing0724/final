@@ -1,0 +1,50 @@
+import processing.serial.*;
+
+Serial myPort;
+String gameStatus = "";
+
+void setup() {
+  size(600, 400);
+  printArray(Serial.list());
+  myPort = new Serial(this, Serial.list()[0], 9600);
+  myPort.clear(); 
+  textAlign(CENTER, CENTER);
+  textSize(24);
+}
+
+void draw() {
+  background(30);
+  fill(255);
+  text("Player A (W/S)           PING PONG           Player B (↑/↓)", width/2, 50);
+  fill(200);
+  text("Use W/S and ↑/↓ to move paddles", width/2, 100);
+
+  if (gameStatus.equals("G")) {
+    fill(0, 255, 0);
+    text("✔ 擋住了！", width/2, height - 60);
+  } else if (gameStatus.equals("X")) {
+    fill(255, 0, 0);
+    text("❌ 出界了！", width/2, height - 60);
+  }
+}
+
+void keyPressed() {
+  if (key == 'w' || key == 'W') {
+    myPort.write('U'); // 左邊上
+  } else if (key == 's' || key == 'S') {
+    myPort.write('D'); // 左邊下
+  } else if (keyCode == UP) {
+    myPort.write('I'); // 右邊上
+  } else if (keyCode == DOWN) {
+    myPort.write('K'); // 右邊下
+  }
+}
+
+void serialEvent(Serial p) {
+  char inChar = p.readChar();
+  if (inChar == 'G') {
+    gameStatus = "G";
+  } else if (inChar == 'X') {
+    gameStatus = "X";
+  }
+}
